@@ -52,7 +52,7 @@ namespace MySpotify.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         [RequestSizeLimit(1000000000)]
-        public ActionResult AddMedia(MediaAdd media, IFormFile? upPoster , IFormFile? upMediaFile , string genre)
+        public async Task<ActionResult> AddMedia(MediaAdd media, IFormFile? upPoster , IFormFile? upMediaFile , string genre)
         {
             if (!isLogged())
             {
@@ -75,8 +75,8 @@ namespace MySpotify.Controllers
             {
                 var user = _contextUser.GetUserList().Result.Where(x => x.id == int.Parse(HttpContext.Session.GetString("Id"))).FirstOrDefault();
 
-                UpLoadMedia(upMediaFile, MediaAdress);
-                UpLoadMedia(upPoster, PosterAdress);
+                await UpLoadMedia(upMediaFile, MediaAdress);
+                await UpLoadMedia(upPoster, PosterAdress);
                 Media newMedia = new Media();
                 newMedia.Name = media.Name;
                 newMedia.Artist = media.Artist;
@@ -86,9 +86,9 @@ namespace MySpotify.Controllers
                 newMedia.User = user;
                 newMedia.Genre = media.genre;
 
-                _contextMedia.CreateMedia(newMedia);
-                _contextMedia.SaveDb();
-                _contextUser.SaveDb();
+                await _contextMedia.CreateMedia(newMedia);
+                await _contextMedia.SaveDb();
+                await _contextUser.SaveDb();
                
                 return Redirect("/Media/Index");
                
@@ -96,9 +96,9 @@ namespace MySpotify.Controllers
             //return View("/Users/Index");
             return View(media);
         }
+        
 
-
-        async void UpLoadMedia(IFormFile? formFile , string MediaPath)
+        async Task UpLoadMedia(IFormFile? formFile , string MediaPath)
         {
             if (!isLogged())
             {
@@ -107,7 +107,7 @@ namespace MySpotify.Controllers
 
             using (var fileStream = new FileStream(_environment.WebRootPath + MediaPath, FileMode.Create))
             {
-                await formFile.CopyToAsync(fileStream);
+                await formFile.CopyToAsync(fileStream);   //ошибка
             };
         }
       
@@ -260,12 +260,13 @@ namespace MySpotify.Controllers
             {
                 return NotFound();
             }
-            if (media.TypeMedia != null && media.Artist != null && media.FileAdress != null && media.Name != null && media.Genre != null && media.Poster != null)
+            if (media.TypeMedia != null && media.Artist != null && media.FileAdress != null && media.Name != null && media.Poster != null)
             {
+            
                 try
                 {
-                    _contextMedia.UpdateMedia(media);
-                    await _contextMedia.SaveDb();
+                    await _contextMedia.UpdateMedia(media);
+                     
                 }
                 catch (DbUpdateConcurrencyException)
                 {

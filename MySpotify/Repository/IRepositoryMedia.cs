@@ -9,7 +9,7 @@ namespace MySpotify.Repository
         Task CreateMedia(Media media);
         Task SaveDb();
         Task DeleteMedia(int id);
-        void UpdateMedia(Media MediaFile);
+        Task UpdateMedia(Media MediaFile);
 
         void UpdateGenre(Genre genre);
         Task<List<Genre>> GetGenresList();

@@ -231,8 +231,8 @@ namespace MySpotify.Controllers
             {
                 try
                 {
-                    _contextMedia.UpdateMedia(media);
-                    await _contextMedia.SaveDb();
+                    await _contextMedia.UpdateMedia(media);
+                    
                 }
                 catch (DbUpdateConcurrencyException)
                 {
