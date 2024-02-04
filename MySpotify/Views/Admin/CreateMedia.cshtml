@@ -1,0 +1,58 @@
+﻿@model MediaAdd
+
+
+
+<div class="row">
+    <div>
+        <form asp-action="CreateMedia" asp-controller="Admin" enctype="multipart/form-data">
+            <h4>Media</h4>
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="Name" class="control-label">Название</label>
+                <input asp-for="Name" class="form-control" />
+                <span asp-validation-for="Name" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Artist" class="control-label">Исполнитель</label>
+                <input asp-for="Artist" class="form-control" />
+                <span asp-validation-for="Artist" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="FileAdress" class="control-label">mp3 Файл</label>
+                <input asp-for="FileAdress" name="upMediaFile" class="form-control" type="file" accept=".mp3"/>
+                <span asp-validation-for="FileAdress" class="text-danger"></span>
+            </div>
+            <div>
+                <label asp-for="Poster" class="control-label">Постер</label><br />
+                <input asp-for="Poster" name="upPoster" type="file" class="form-control" accept=".jpg, .jpeg, .png" />
+                <span asp-validation-for="Poster" class="text-danger"></span>
+            </div>
+
+
+            <div class="form-group">
+                @Html.DropDownList("typeMedia",
+                         Html.GetEnumSelectList<TypeMedia>(),
+                         "Select Type",
+                         new { @class = "form-control" })
+
+
+            </div>
+            <div class="form-group">
+                @Html.DropDownList("genre",
+                         ViewBag.Genres,
+                         "Select genre",
+                         new { @class = "form-control" })
+
+
+            </div>
+
+
+
+        </form>
+    </div>
+</div>
+
+
+
+
+

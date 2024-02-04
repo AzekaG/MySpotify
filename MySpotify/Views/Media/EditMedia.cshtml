@@ -1,0 +1,56 @@
+﻿@model MySpotify.Models.Media
+
+
+<div class="row">
+    <div>
+        <form asp-action="EditMedia" asp-controller="Admin" enctype="multipart/form-data">
+            <h4>Media</h4>
+            <input type="hidden" asp-for="Id"/>
+            <input name="User" type="hidden" asp-for="@(Model.User.id)"/>
+            
+
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="Name" class="control-label">Название</label>
+                <input asp-for="Name" class="form-control" />
+                <span asp-validation-for="Name" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Artist" class="control-label">Исполнитель</label>
+                <input asp-for="Artist" class="form-control" />
+                <span asp-validation-for="Artist" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="FileAdress" class="control-label">mp3 Файл</label>
+                <label asp-for="FileAdress"  class="form-control">@Model.FileAdress</label>
+                <input type="hidden" asp-for="FileAdress" />
+                <span asp-validation-for="FileAdress" class="text-danger"></span>
+            </div>
+            <div>
+                <label asp-for="Poster" class="control-label">Постер</label><br />
+                <label asp-for="Poster" class="form-control">@Model.Poster</label>
+                <input type="hidden" asp-for="Poster"/>
+                <span asp-validation-for="Poster" class="text-danger"></span>
+            </div>
+
+            <div class="form-group" >
+                @Html.DropDownList("TypeMedia",
+                         Html.GetEnumSelectList<TypeMedia>(),
+                         @Model.TypeMedia.ToString(),
+                         new { @class = "form-control"})
+            </div>
+
+            <div class="form-group">
+                <label asp-for="Genre" class="control-label">Жанр песни : @Model.Genre?.Name</label>
+                <select asp-for="Genre" class="form-control" asp-items="ViewBag.Genres">
+                </select>
+                <span asp-validation-for="Genre" class="text-danger"></span>
+            </div>
+     </form>
+    </div>
+</div>
+    
+
+
+
+

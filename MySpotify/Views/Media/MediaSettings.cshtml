@@ -1,0 +1,204 @@
+﻿@model User
+
+
+<style>
+
+    html {
+        overflow: auto;
+    }
+
+    body {
+        background: rgb(235, 239, 250) center no-repeat;
+    }
+
+    .ui-dialog {
+        opacity: 100%;
+        background-color: gray;
+        z-index: 10;
+    }
+</style>
+
+
+<video autoplay muted loop id="myVideo">
+    <source src="~/img/network_-_12716 (1080p).mp4" type="video/mp4">
+</video>
+
+<div class="header navbar navbar-expand-lg navbar-light bg-black">
+    <div class="header__section">
+        <div class="header__item headerlogo">
+            <a class="nav-item nav-link active" asp-action="Index" asp-controller="Media">
+                <img src="~/img/spotify-logo.svg" style="max-width:100px;" />
+
+            </a>
+        </div>
+
+    </div>
+
+    <div class="header__section">
+        <div class="header__item headerlogo">
+            <a class="nav-item nav-link active" asp-action="Logout" asp-controller="Users">Выйти</a>
+        </div>
+
+    </div>
+</div>
+
+
+<div class="headerIndex adminHeaderIndex">
+    <div class="menu_side">
+        <h1>Playlist</h1>
+        <div class="playlist">
+            <h4 class="active"><span></span><i class="bi bi-house"></i><a asp-action="Index" asp-controller="Media">Домой</a></h4>
+
+        </div>
+    </div>
+
+
+    <div class="song_side" id="song_sideId">
+
+        <div class="adminContent">
+        </div>
+
+
+
+    </div>
+</div>
+
+    <script>
+        CreateMediaBody();
+        function CreateMediaBody() {
+
+            $.ajax({
+                url: '@Url.Action("GetMediaList", "Media")',
+                type: 'GET',
+                contentType: false,
+                processData: false,
+                success: function (response) {
+
+                    let rows = "<ul class='adminGenreContentUl'>";
+                    $.each(response, function (index, media) {
+                        rows += rowMedia(media);
+                    });
+                    rows += "</ul>";
+                    $(".adminContent").html(rows);
+                    ButtonsEventsMedia();
+
+
+                },
+                error: function (x, y, z) {
+                    alert(x + '\n' + y + '\n' + z);
+
+                }
+            });
+
+        }
+
+
+        function rowMedia(media) {
+
+            let rows = "<li>" +
+                "<div style='border:2px solid red; border-radius:10px; width:180px;'>" +
+                "<span>" + media.name + "  " + "</span><span>" + media.artist + "</span>" +
+                "</div>" +
+                "<button asp-action='Edit' asp-route-id='" + media.id + "' class='btnAdminContent btnEditMedia' data-dialog-title='Редактирование' mediaid='" + media.id + "'>" +
+                "<span class='text'>Изменить</span>" + "</button>" +
+                "<button asp-action='Delete' asp-route-id='" + media.id + "' class='btnAdminContent btnDeleteMedia' data-dialog-title='Удаление' mediaid='" + media.id + "'>" +
+                "<span class='text'>Удалить</span>" + "</button>" + "<img src='" + media.poster + "' style = 'width:120px'/>";
+            return rows;
+        }
+
+
+
+        function ButtonsEventsMedia() {
+            /*Реакция на кнопки старт */
+            $(".btnEditMedia").on("click", function (e) {
+                e.preventDefault();
+
+                $("<div id='dialogContent'></div>")
+                    .addClass('dialog')
+                    .appendTo('body')
+                    .dialog({
+                        contentType: false,
+                        processData: false,
+                        title: $(this).attr("data-dialog-title"),
+                        close: function () { $('dialogContent').remove() },
+                        modal: true,
+                        buttons: {
+                            'Сохранить': function () {
+                                $.ajax({
+                                    url: "@Url.Action("EditMedia", "Media")",
+                                    type: "POST",
+                                    data: $('form').serialize(),
+                                    datatype: 'json',
+                                    success: function (result) {
+
+                                        CreateMediaBody();
+                                        $('#dialogContent').remove();
+                                    },
+                                    error: function (result) {
+                                        alert("Not ok");
+                                    }
+                                });
+                            }
+                        }
+                    })
+                    .load('https://localhost:7233/Media/EditMedia/' + this.getAttribute('mediaid'));
+            });
+
+            $(".btnDeleteMedia").on("click", function (e) {
+                e.preventDefault();
+
+                $("<div id='dialogContent'></div>")
+                    .addClass('dialog')
+                    .appendTo('body')
+                    .dialog({
+                        contentType: false,
+                        processData: false,
+                        title: $(this).attr("data-dialog-title"),
+                        close: function () { $('dialogContent').remove() },
+                        modal: true,
+                        buttons: {
+                            'Да, удалить': function () {
+                                $.ajax({
+                                    url: "@Url.Action("DeleteMedia", "Admin")",
+                                    type: "POST",
+                                    data: $('form').serialize(),
+                                    datatype: 'json',
+                                    success: function (result) {
+                                        CreateMediaBody();
+                                        $('#dialogContent').remove();
+                                    }
+                                });
+
+                            },
+                            'Отмена': function () { $('dialogContent').remove() }
+                        }
+                    })
+                    .load('https://localhost:7233/Admin/DeleteMedia/' + this.getAttribute('mediaid'));
+            });
+
+
+
+
+
+            $('.btnAddManagment').on('click', function (e) {
+                e.preventDefault();
+                $(".adminContent").empty();
+                CreateMediaBody();
+
+            });
+
+
+
+
+            /*конец реакции на кнопки*/
+        }
+
+      
+
+
+
+
+    </script>
+
+
+

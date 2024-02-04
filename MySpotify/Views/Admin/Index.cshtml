@@ -1,0 +1,507 @@
+﻿@model List<Genre>
+
+
+<style>
+
+    html {
+        overflow: auto;
+      
+    }
+    body{
+        background: rgb(235, 239, 250) center no-repeat;
+        
+    }
+
+    .ui-dialog{
+        opacity: 100%;
+        background-color: gray;
+        z-index: 10;
+    }
+    
+
+</style>
+
+
+<video autoplay muted loop id="myVideo">
+    <source src="~/img/network_-_12716 (1080p).mp4" type="video/mp4">
+</video>
+
+<div class="header navbar navbar-expand-lg navbar-light bg-black">
+	<div class="header__section">
+		<div class="header__item headerlogo">
+			<a class="nav-item nav-link active" asp-action="Index" asp-controller="Media">
+				<img src="~/img/spotify-logo.svg" style="max-width:100px;" />
+                
+			</a>
+		</div>
+
+	</div>
+
+	<div class="header__section">
+		<div class="header__item headerlogo">
+			<a class="nav-item nav-link active" asp-action="Logout" asp-controller="Users">Выйти</a>
+		</div>
+		
+	</div>
+</div>
+
+
+<div class="headerIndex adminHeaderIndex" >
+    <div class="menu_side">
+        <h1>Playlist</h1>
+        <div class="playlist">
+            <h4 class="active" id="GenreManagment"><span></span><i class="bi bi-plus-circle"></i><a asp-action="Index" id="btnAddManagment">Управление жанрами</a></h4>
+            <h4 class="noactive" id="AddManagment"><span></span><i class="bi bi-plus-circle"></i><a asp-action="" class="btnAddManagment">Управление песнями </a></h4>
+            <h4 class="noactive" id="AccManagment"><span></span><i class="bi bi-plus-circle"></i><a asp-action="CreateAccountsBody" asp-controller="AdminForUsersController" class="btnAccManagment">Управление аккаунтами </a></h4>
+            <h4 class="active"><span></span><i class="bi bi-house"></i><a asp-action="Index" asp-controller="Media">Домой</a></h4>
+           
+        </div>
+    </div>
+
+
+    <div class="song_side" id="song_sideId">
+      
+        <div class="adminContent">
+          
+            
+        </div>
+      
+      
+
+    </div>
+    </div>
+    @section Scripts {
+        <script>
+
+            CreateBodyGenre();
+            
+            function CreateBodyGenre() {
+                $.ajax({
+                    url: '@Url.Action("GetGenreList", "Admin")',
+                    type: 'GET',
+                    contentType: false,
+                    processData: false,
+                    success: function (response) {
+
+                        let rows = "<ul class='adminGenreContentUl'>";
+                        $.each(response, function (index, genre) {
+                            rows += rowMsg(genre);
+                        });
+                        rows += "</ul><button class='btnAdminContent btnCreate' asp-route-id='1' asp-action='Create' data-dialog-title='Создание'><span class='text'>Создать</span></button>";
+                        $(".adminContent").html(rows);
+                        ButtonsEvents();
+                    },
+                    error: function (x, y, z) {
+                        alert(x + '\n' + y + '\n' + z);
+
+                    }
+                });
+
+            }
+
+
+            function rowMsg(genre) {
+                    
+                let rows = "<li>" +
+                    "<div style='border:2px solid red; border-radius:10px; width:180px;'>" +
+                    "<span>" + genre.name + "</span>" +
+                    "</div>" +
+                    "<button asp-action='Edit' asp-route-id='" + genre.id + "' class='btnAdminContent btnEdit' data-dialog-title='Редактирование' genreid='"+genre.id+"'>" +
+                    "<span class='text'>Изменить</span>" + "</button>" +
+                    "<button asp-action='Delete' asp-route-id='" + genre.id + "' class='btnAdminContent btnDelete' data-dialog-title='Удаление' genreid='" + genre.id + "'>" +
+                    "<span class='text'>Удалить</span>" + "</button>";
+                return rows;
+            }
+
+            function ButtonsEvents() {
+               $(".btnEdit").on("click", function (e) {
+                    e.preventDefault();
+
+                    $("<div id='dialogContent'></div>")
+                        .addClass('dialog')
+                        .appendTo('body')
+                        .dialog({
+                            contentType: false,
+                            processData: false,
+                            title: $(this).attr("data-dialog-title"),
+                            close: function () { $('#dialogContent').remove() },
+                            modal: true,
+                            buttons: {
+                                'Сохранить': function () {
+                                    $.ajax({
+                                        url: "@Url.Action("Edit", "Admin")",
+                                        type: "POST",
+                                        data: $('form').serialize(),
+                                        datatype: 'json',
+                                        success: function (result) {
+                                            CreateBodyGenre();
+                                            $('#dialogContent').remove();
+                                        }
+                                    });
+                                }
+                            }
+                        })
+                        .load('https://localhost:7233/Admin/Edit/' + this.getAttribute('genreid'));
+                });
+               $(".btnDelete").on("click", function (e) {
+                    e.preventDefault();
+
+                    $("<div id='dialogContent'></div>")
+                        .addClass('dialog')
+                        .appendTo('body')
+                        .dialog({
+                            contentType: false,
+                            processData: false,
+                            title: $(this).attr("data-dialog-title"),
+                            close: function () { $('dialogContent').remove() },
+                            modal: true,
+                            buttons: {
+                                'Удалить': function () {
+                                    $.ajax({
+                                        url: "@Url.Action("Delete", "Admin")",
+                                        type: "POST",
+                                        data: $('form').serialize(),
+                                        datatype: 'json',
+                                        success: function (result) {
+                                            CreateBodyGenre();
+                                            $('#dialogContent').remove();
+                                        }
+                                    });
+
+                                },
+                                'Отмена': function () {
+                                    alert("remove");
+                                   
+                                    $(this).dialog("close");
+                                }
+                            }
+                        })
+                        .load('https://localhost:7233/Admin/Delete/' + this.getAttribute('genreid'));
+                });
+               $(".btnCreate").on('click', function (e) {
+                    e.preventDefault();
+
+                    $("<div id='dialogContent'></div>")
+                        .addClass('dialog')
+                        .appendTo('body')
+                        .load('https://localhost:7233/Admin/Create')
+                        .dialog({
+                            title: $(this).attr("data-dialog-title"),
+                            close: function () { $(this).remove() },
+                            modal: true,
+                            buttons: {
+                                'Создать': function () {
+                                    $.ajax({
+                                        url: "@Url.Action("Create", "Admin")",
+                                        type: "POST",
+                                        data: $('form').serialize(),
+                                        datatype: 'json',
+                                        success: function (result) {
+                                            CreateBodyGenre();
+                                            $("#dialogContent").remove();
+                                        }
+                                    });
+
+                                }
+
+                            }
+                        });
+
+
+                });
+                $('.btnAddManagment').on('click', function (e) {
+                    e.preventDefault();
+                    $(".adminContent").empty();
+                    CreateMediaBody();
+
+               });
+
+
+
+                $('.btnAccManagment').on('click', function (e) {
+                    e.preventDefault();
+                    $(".adminContent").empty();
+                    CreateAccountsBody();
+                });
+
+
+
+                /*btnEventsEnd */
+            }
+
+
+
+
+            function CreateMediaBody() {
+                
+                    $.ajax({
+                        url: '@Url.Action("GetMediaList", "Admin")',
+                        type: 'GET',
+                        contentType: false,
+                        processData: false,
+                        success: function (response) {
+
+                            let rows = "<ul class='adminGenreContentUl'>";
+                            $.each(response, function (index, media) {
+                                rows += rowMedia(media);
+                            });
+                            rows += "</ul><button class='btnAdminContent btnCreateMedia' asp-route-id='1' asp-action='Create' data-dialog-title='Создание'><span class='text'>Создать</span></button>";
+                            $(".adminContent").html(rows);
+                        $("#AddManagment").removeClass('noactive');
+                        $("#AddManagment").addClass('active');
+                                        ButtonsEventsMedia();
+
+                            
+                        },
+                        error: function (x, y, z) {
+                            alert(x + '\n' + y + '\n' + z);
+
+                        }
+                    });
+
+                }
+
+
+            function rowMedia(media) {
+
+                let rows = "<li>" +
+                    "<div style='border:2px solid red; border-radius:10px; width:180px;'>" +
+                    "<span>" + media.name + "  "+ "</span><span>" + media.artist+ "</span>" +
+                    "</div>" +
+                    "<button asp-action='Edit' asp-route-id='" + media.id + "' class='btnAdminContent btnEditMedia' data-dialog-title='Редактирование' mediaid='" + media.id + "'>" +
+                    "<span class='text'>Изменить</span>" + "</button>" +
+                    "<button asp-action='Delete' asp-route-id='" + media.id + "' class='btnAdminContent btnDeleteMedia' data-dialog-title='Удаление' mediaid='" + media.id + "'>" +
+                    "<span class='text'>Удалить</span>" + "</button>" + "<img src='" + media.poster + "' style = 'width:120px'/>";
+                return rows;
+            }
+
+
+
+            function ButtonsEventsMedia()
+            {
+                /*Реакция на кнопки старт */
+                $(".btnEditMedia").on("click", function (e) {
+                    e.preventDefault();
+                    
+                    $("<div id='dialogContent'></div>")
+                        .addClass('dialog')
+                        .appendTo('body')
+                        .dialog({
+                            contentType: false,
+                            processData: false,
+                            title: $(this).attr("data-dialog-title"),
+                            close: function () { $('dialogContent').remove() },
+                            modal: true,
+                            buttons: {
+                                'Сохранить': function () {
+                                    $.ajax({
+                                        url: "@Url.Action("EditMedia", "Admin")",
+                                        type: "POST",
+                                        data: $('form').serialize(),
+                                        datatype: 'json',
+                                        success: function (result) {
+                                           
+                                            CreateMediaBody();
+                                            $('#dialogContent').remove();
+                                        },
+                                        error: function(result) {
+                                        alert("Not ok");
+                                        }
+                                    });
+                                }
+                            }
+                        })
+                        .load('https://localhost:7233/Admin/EditMedia/' + this.getAttribute('mediaid'));
+                });
+
+                $(".btnDeleteMedia").on("click", function (e) {
+                    e.preventDefault();
+
+                    $("<div id='dialogContent'></div>")
+                        .addClass('dialog')
+                        .appendTo('body')
+                        .dialog({
+                            contentType: false,
+                            processData: false,
+                            title: $(this).attr("data-dialog-title"),
+                            close: function () { $('dialogContent').remove() },
+                            modal: true,
+                            buttons: {
+                                'Да, удалить': function () {
+                                    $.ajax({
+                                        url: "@Url.Action("DeleteMedia", "Admin")",
+                                        type: "POST",
+                                        data: $('form').serialize(),
+                                        datatype: 'json',
+                                        success: function (result) {
+                                            CreateMediaBody();
+                                            $('#dialogContent').remove();
+                                        }
+                                    });
+
+                                },
+                                'Отмена': function () { $('dialogContent').remove() }
+                            }
+                        })
+                        .load('https://localhost:7233/Admin/DeleteMedia/' + this.getAttribute('mediaid'));
+                });
+
+
+
+
+              
+                $('.btnAddManagment').on('click', function (e) {
+                    e.preventDefault();
+                    $(".adminContent").empty();
+                    CreateMediaBody();
+
+                });
+
+
+
+
+                /*конец реакции на кнопки*/
+             }
+
+            function CreateAccountsBody() {
+                $.ajax({
+                    url: '@Url.Action("GetUserList", "AdminForUsers")',
+                    type: 'GET',
+                    contentType: false,
+                    processData: false,
+                    success: function (response) {
+
+                        let rows = "<ul class='adminGenreContentUl'>";
+                        $.each(response, function (index, User) {
+                            rows += rowAcc(User);
+                        });
+                        rows += "</ul>";
+                        $(".adminContent").html(rows);
+                        $("#AddManagment").removeClass('active');
+                        $("#AddManagment").addClass('noactive');
+                        ButtonsEventsAcc();
+
+
+                    },
+                    error: function (x, y, z) {
+                        alert(x + '\n' + y + '\n' + z);
+
+                    }
+                });
+
+            }
+            
+
+            function ButtonsEventsAcc() 
+            {
+               
+                $('.btnInfoAcc').on('click', function (e) {
+                    e.preventDefault();
+                    $("<div id='dialogContent'></div>")
+                        .addClass('dialog')
+                        .appendTo('body')
+                        .dialog({
+                            contentType: false,
+                            processData: false,
+                            title: $(this).attr("data-dialog-title"),
+                            close: function () { $('#dialogContent').remove() },
+                            modal: true,
+                            buttons: {
+                                'Сохранить': function () {
+                                    $.ajax({
+                                        url: "@Url.Action("Edit", "AdminForUsers")",
+                                        type: "POST",
+                                        data: $('form').serialize(),
+                                        datatype: 'json',
+                                        success: function (result) {
+                                            alert("Изменения сохранены");
+                                        CreateAccountsBody();
+                                            $('#dialogContent').remove();
+                                           
+                                        }
+                                    });
+                                }
+                            }
+                        })
+                        .load('https://localhost:7233/AdminForUsers/Edit/' + this.getAttribute('accountId'));
+
+
+
+
+                });
+
+
+
+                $('.btnDeleteAcc').on('click', function (e) {
+                    e.preventDefault();
+
+                    $("<div id='dialogContent'></div>")
+                    .addClass('dialog')
+                    .appendTo('body')
+                    .dialog({
+                        contentType: false,
+                        processData: false,
+                        title: $(this).attr("data-dialog-title"),
+                        close: function () { $('#dialogContent').remove() },
+                        modal: true,
+                        buttons: {
+                            'Удалить': function () {
+                                $.ajax({
+                                    url: "@Url.Action("DeleteAcc", "AdminForUsers")",
+                                    type: "POST",
+                                    data: $('form').serialize(),
+                                    datatype: 'json',
+                                    success: function (result) {
+                                        alert("Удалён");
+                                        CreateAccountsBody();
+                                        $('#dialogContent').remove();
+
+                                    }
+                                });
+                            }
+                        }
+                    })
+                    .load('https://localhost:7233/AdminForUsers/DeleteAcc/' + this.getAttribute('accountId'));
+
+
+
+
+                    //fnsh btnDeleteAcc
+                });
+
+
+
+
+
+
+
+
+
+
+
+
+            }
+
+            
+            function rowAcc(User) {
+
+                let rows = "<li>" +
+                    "<div style='border:2px solid red; border-radius:10px; width:180px;'>" +
+                    "<span>" + User.firstName + "  " + "</span><span>" + User.lastName + "</span>" +
+                    "</div>" +
+                    "<button asp-route-id='" + User.id + "' class='btnAdminContent btnInfoAcc' data-dialog-title='Редактирование' accountId='" + User.id + "'>" +
+                    "<span class='text'>Изменить</span>" + "</button>" +
+                    "<button  asp-route-id='" + User.id + "' class='btnAdminContent btnDeleteAcc' data-dialog-title='Удаление' accountId='" + User.id + "'>" +
+                    "<span class='text'>Удалить</span>" + "</button>";
+                return rows;
+            }
+
+
+          
+
+
+
+        </script>
+    }
+
+

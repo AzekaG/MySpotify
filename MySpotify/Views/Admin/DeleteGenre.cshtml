@@ -1,0 +1,17 @@
+﻿@model MySpotify.Models.Genre
+
+
+<div class="row">
+    <div>
+        <form asp-action="EditGenre">
+            <h4>Удаление</h4>
+            <hr/>
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="Id" />
+            <div class="form-group">
+                <h5>Вы действительно хотите удалить этот жанр? </h5>
+            </div>
+        </form>
+    </div>
+</div>
+

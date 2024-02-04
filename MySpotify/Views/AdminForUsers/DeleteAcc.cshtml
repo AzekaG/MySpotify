@@ -1,0 +1,17 @@
+﻿@model MySpotify.Models.User
+
+
+<div class="row">
+    <div>
+        <form asp-action="DeleteAcc">
+            <h4>Удаление</h4>
+            <hr />
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="id" />
+            <div class="form-group">
+                <h5>Вы действительно хотите удалить этого пользователя? </h5>
+            </div>
+        </form>
+    </div>
+</div>
+

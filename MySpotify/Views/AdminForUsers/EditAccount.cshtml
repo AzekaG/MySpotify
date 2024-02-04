@@ -1,0 +1,58 @@
+﻿@model User
+
+
+<div class="form-value">
+	<form asp-action="Edit">
+		<div asp-validation-summary="ModelOnly" class="text-danger"></div>
+				<h2>Status @Model.Active</h2>
+				<input type="hidden" asp-for="id" />
+		<input type="hidden" asp-for="MediaFiles" />
+		<input type="hidden" asp-for="Password" />
+		<input type="hidden" asp-for="Salt" />
+	
+				<div class=" form-group">
+					<ion-icon name="accessibility-outline"></ion-icon>
+					<label asp-for="FirstName" class="control-label">@Model.FirstName</label>
+			<input type="hidden" asp-for="FirstName" />
+					<span asp-validation-for="FirstName" class="text-danger"></span>
+				</div>
+
+				<div class=" form-group">
+					<ion-icon name="accessibility-outline"></ion-icon>
+					<label asp-for="LastName" class="control-label">@Model.LastName</label>
+			<input type="hidden" asp-for="LastName" />
+					<span asp-validation-for="LastName" class="text-danger"></span>
+				</div>
+
+				<div class=" form-group">
+					<ion-icon name="mail-outline"></ion-icon>
+					<label asp-for="Email" class="control-label">@Model.Email</label>
+			<input type="hidden" asp-for="Email" />
+					<span asp-validation-for="Email" class="text-danger"></span>
+				</div>
+
+				   <div class="form-group" >
+                @Html.DropDownList("Status",
+                         Html.GetEnumSelectList<Status>(),
+                         new { @class = "form-control"})
+				   </div>
+		<div class="form-group">
+		<label class='switch lblActivateUser' asp-for="Active">
+				<p>Активный:@Model.isActive()</p>
+			<input type='checkbox' class='btnActivateUser' asp-for="Active">
+			<span class='slider round'></span> 
+		</label>
+	
+ 
+		</div>
+
+
+	</form>
+</div>
+			
+
+	
+	
+
+
+
