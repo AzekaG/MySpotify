@@ -30,7 +30,7 @@ builder.Services.AddDbContext<MediaUserContext>(options => options.UseSqlServer(
 
 builder.Services.AddControllersWithViews();
 builder.Services.AddScoped<IRepositoryUser, UserRepository>();
-builder.Services.AddTransient<IRepositoryMedia, MediaRepository>();
+builder.Services.AddScoped<IRepositoryMedia, MediaRepository>();
 
 var app = builder.Build();
 

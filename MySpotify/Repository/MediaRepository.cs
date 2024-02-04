@@ -22,21 +22,25 @@ namespace MySpotify.Repository
             if(media != null)
                 _mediauserContext.Medias.Remove(media);
         }
-        public  void UpdateMedia(Media media)
+        public async Task UpdateMedia(Media media)
         {
             try
             {
-                var MediaSave = _mediauserContext.Medias.FirstOrDefault(x => x.Id == media.Id);
-                MediaSave.Poster = media.Poster;
-                MediaSave.FileAdress = media.FileAdress;
-                MediaSave.Name = media.Name;
-                MediaSave.Genre = media.Genre;
-                MediaSave.Artist = media.Artist;
-                _mediauserContext.SaveChangesAsync();
+               await Task.Run(() => {
+                    var MediaSave = _mediauserContext.Medias.FirstOrDefault(x => x.Id == media.Id);
+                    MediaSave.Poster = media.Poster;
+                    MediaSave.FileAdress = media.FileAdress;
+                    MediaSave.Name = media.Name;
+                    MediaSave.Genre = media.Genre;
+                    MediaSave.Artist = media.Artist;
+                    MediaSave.TypeMedia = media.TypeMedia;
+                });
+              await _mediauserContext.SaveChangesAsync();
+               
             }
             catch(Exception ex) 
             {
-                     Console.WriteLine(ex.Message + "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+                     Console.WriteLine("_____________________________" + ex.Message + "!!!");
             }
 
 
